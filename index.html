@@ -22,6 +22,8 @@
     -webkit-box-shadow: 1px 11px 27px -16px rgba(0,0,0,0.51);
     -moz-box-shadow: 1px 11px 27px -16px rgba(0,0,0,0.51);
     padding: 20px;
+    max-height: 100vh;
+    overflow: auto;
   }
 
   main {
@@ -113,6 +115,8 @@ const reset = () => {
   renderApp();
 }
 
+const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100
+
 const listItemComp = () => {
   return html.node`
     <ul style="list-style: none;">${foods.map((food, index) => html.node`
@@ -146,7 +150,7 @@ const layout = () => {
   <header>
     <details>
       <summary>
-        Carbs: <span class="food-item">${mealCarbs}</span> Sodium: <span class="food-item">${mealSodium}</span><br />
+        Carbs: <span class="food-item">${round(mealCarbs)}</span> Sodium: <span class="food-item">${round(mealSodium)}</span><br />
         Selected: ${selectedItems.map((item)=>item.name).join(", ")}
       </summary>
       <div>${selectedItemsComp()}</div>
