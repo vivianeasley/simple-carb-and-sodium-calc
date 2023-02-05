@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Carb/Sodium Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #7FD36C;
+    box-shadow: 1px 11px 27px -16px rgba(0,0,0,0.51);
+    -webkit-box-shadow: 1px 11px 27px -16px rgba(0,0,0,0.51);
+    -moz-box-shadow: 1px 11px 27px -16px rgba(0,0,0,0.51);
+    padding: 20px;
+  }
+
+  main {
+    margin-top: 100px;
+  }
+
+  .food-list-wrapper {
+    column-count: 4;
+    column-gap: 10px;
+  }
+
+  .food-item {
+    font-weight: bold;
+    font-size: 18px;
+    color: blue
+  }
+
+  @media only screen and (max-width: 900px) {
+    .food-list-wrapper {
+      column-count: 3;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    .food-list-wrapper {
+      column-count: 2;
+    }
+  }
+
+  @media only screen and (max-width: 375px) {
+    .food-list-wrapper {
+      column-count: 1;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+  <div id="main"></div>
+
+<script src="https://unpkg.com/uhtml"></script>
+<script>
+const {render, html, svg} = uhtml;
+
+let selectedItems = [];
+let mealSodium = 0;
+let mealCarbs = 0;
+
+const foods = (() => {
+  const tmpFood = getFoods();
+  return tmpFood.map((item, index)=>({...item, id: index + 1}))
+})();
+
+const mealTotal = () => {
+  mealSodium = 0
+  mealCarbs = 0
+  for (let itemIndex = 0; itemIndex < selectedItems.length; itemIndex++) {
+    mealSodium += selectedItems[itemIndex].sodium;
+    mealCarbs += selectedItems[itemIndex].carbs;
+  }
+
+}
+
+const selectFood = (id, e) => {
+  const alreadySelectedIndex = selectedItems.findIndex((item)=>item.id === id)
+  if (alreadySelectedIndex !== -1) {
+    selectedItems.splice(alreadySelectedIndex, 1);
+    renderApp();
+    return;
+  }
+
+  const item = foods.find((item)=>item.id === id);
+  selectedItems.push(item);
+  renderApp();
+}
+
+const fractionFood = (amt, id) => {
+  const item = foods.find((item)=>item.id === id);
+  item.carbs = item.carbs*amt;
+  item.sodium = item.sodium*amt;
+  renderApp();
+}
+
+const reset = () => {
+  selectedItems = [];
+  mealSodium = 0;
+  mealCarbs = 0;
+  renderApp();
+}
+
+const listItemComp = () => {
+  return html.node`
+    <ul style="list-style: none;">${foods.map((food, index) => html.node`
+      <li>
+        <input type="checkbox" id=${"food-item-"+index} name=${"food-item-"+index} checked=${selectedItems.find((item)=>food.id === item.id) ? "true" : null} onclick=${(e)=>selectFood(food.id, e)}>
+        <label for=${"food-item-"+index}><span class="food-item">${food.name}</span><br/>• Carbs: ${food.carbs}g<br/>• Sodium: ${food.sodium}g</label><br>
+      </li>
+    `)}
+    </ul>
+  `
+}
+
+const selectedItemsComp = () => {
+  return html.node`
+    <ul style="list-style: none;">${selectedItems.map((food, index) => html.node`
+      <li>
+        <div for=${"food-item-"+index}><span class="food-item">${food.name}</span><br/>• Carbs: ${food.carbs}g<br/>• Sodium: ${food.sodium}g<br>
+          <button onclick=${()=>fractionFood(0.75, food.id)}>0.75</button>
+          <button onclick=${()=>fractionFood(0.5, food.id)}>0.5</button>
+          <button onclick=${()=>fractionFood(0.25, food.id)}>0.25</button>
+          <button onclick=${()=>fractionFood(0.125, food.id)}>0.125</button>
+          </div>
+      </li>
+    `)}
+    </ul>
+  `
+}
+
+const layout = () => {
+  return html`
+  <header>
+    <details>
+      <summary>
+        Carbs: <span class="food-item">${mealCarbs}</span> Sodium: <span class="food-item">${mealSodium}</span><br />
+        Selected: ${selectedItems.map((item)=>item.name).join(", ")}
+      </summary>
+      <div>${selectedItemsComp()}</div>
+    </details>  
+  </header>
+  <main>
+    <div style="margin-bottom: 10px"><h3 style="display: inline">Foods</h3><span> (All amounts in 1 cup measurements unless egg, tortilla, etc.)</span> <button onclick=${reset}>Reset</button></div>
+    <div class="food-list-wrapper">${listItemComp()}</div>
+  </main>
+
+    `
+}
+
+renderApp();
+function renderApp () {
+  mealTotal();
+  render(document.querySelector("#main"), html`${layout()}`);
+}
+
+
+
+function getFoods () {
+  return [
+    {
+      name: "Unsalted Peanuts",
+      sodium: 0.026,
+      carbs: 24
+    },
+    {
+      name: "Raisins",
+      sodium: 0.018,
+      carbs: 34
+    },
+    {
+      name: "Dired Apricots",
+      sodium: 0.013,
+      carbs: 34
+    },
+    {
+      name: "Cottage Cheese",
+      sodium: 0.819,
+      carbs: 8
+    },
+    {
+      name: "Corn Tortilla",
+      sodium: 0.013,
+      carbs: 13
+    },
+    {
+      name: "Tortilla Chips",
+      sodium: 0.539,
+      carbs: 46
+    },
+    {
+      name: "Mayo",
+      sodium: 1.397,
+      carbs: 1.3
+    },
+    {
+      name: "Mustard",
+      sodium: 2.826,
+      carbs: 13
+    },
+    {
+      name: "Olive Oil",
+      sodium: 0.004,
+      carbs: 0
+    },
+    {
+      name: "Vinegar",
+      sodium: 0.005,
+      carbs: 0
+    },
+    {
+      name: "Soy Sauce",
+      sodium: 14.007,
+      carbs: 13
+    },
+    {
+      name: "Sausage",
+      sodium: 0.826,
+      carbs: 0.7
+    },
+    {
+      name: "Bell Pepper",
+      sodium: 0.003,
+      carbs: 7
+    },
+    {
+      name: "Cream Cheese",
+      sodium: 0.745,
+      carbs: 9
+    },
+    {
+      name: "Almonds",
+      sodium: 0.001,
+      carbs: 9
+    },
+    {
+      name: "Onion",
+      sodium: 0.005,
+      carbs: 15
+    },
+    {
+      name: "Rasberries",
+      sodium: 0.001,
+      carbs: 15
+    },
+    {
+      name: "Almond Butter",
+      sodium: 0.018,
+      carbs: 47
+    },
+    {
+      name: "Tofu",
+      sodium: 0.018,
+      carbs: 5
+    },
+    {
+      name: "Calliflower Rice",
+      sodium: 1.202,
+      carbs: 3
+    },
+    {
+      name: "Hummus",
+      sodium: 0.932,
+      carbs: 35
+    },
+    {
+      name: "Low Carb Bread",
+      sodium: 0.150,
+      carbs: 12
+    },
+    {
+      name: "Arugula",
+      sodium: 0.006,
+      carbs: 0.4
+    },
+    {
+      name: "Butter Lettuce",
+      sodium: 0.003,
+      carbs: 0.5
+    },
+    {
+      name: "Cabbage",
+      sodium: 0.013,
+      carbs: 3
+    },
+    {
+      name: "Chard",
+      sodium: 0.103,
+      carbs: 0.8
+    },
+    {
+      name: "Collard Greens",
+      sodium: 0.006,
+      carbs: 3.9
+    },
+    {
+      name: "Iceberg",
+      sodium: 0.007,
+      carbs: 1.2
+    },
+    {
+      name: "Mustard Greens",
+      sodium: 0.011,
+      carbs: 0.8
+    },
+    {
+      name: "Romaine",
+      sodium: 0.004,
+      carbs: 0.6
+    },
+    {
+      name: "Spinach",
+      sodium: 0.024,
+      carbs: 0.4
+    },
+    {
+      name: "Sprouts",
+      sodium: 0.006,
+      carbs: 0.1
+    },
+    {
+      name: "Asparagus",
+      sodium: 0.003,
+      carbs: 2.4
+    },
+    {
+      name: "Broccoli",
+      sodium: 0.030,
+      carbs: 2.6
+    },
+    {
+      name: "Brussel Sprouts",
+      sodium: 0.0,
+      carbs: 4.6
+    },
+    {
+      name: "Cauliflower",
+      sodium: 0.022,
+      carbs: 3.2
+    },
+    {
+      name: "Celery",
+      sodium: 0.080,
+      carbs: 1.4
+    },
+    {
+      name: "Eggplant",
+      sodium: 0.002,
+      carbs: 2.3
+    },
+    {
+      name: "Green Beans",
+      sodium: 0.006,
+      carbs: 4.3
+    },
+    {
+      name: "Mushrooms",
+      sodium: 0.004,
+      carbs: 2.2
+    },
+    {
+      name: "Zucchini",
+      sodium: 0.009,
+      carbs: 2.4
+    },
+    {
+      name: "Avocados",
+      sodium: 0.011,
+      carbs: 1.8
+    },
+    {
+      name: "Raspberries",
+      sodium: 0.001,
+      carbs: 3.3
+    },
+    {
+      name: "Blueberries",
+      sodium: 0.015,
+      carbs: 8.9
+    },
+    {
+      name: "Blackberries",
+      sodium: 0.001,
+      carbs: 3.1
+    },
+    {
+      name: "Coconut",
+      sodium: 0.252,
+      carbs: 2.5
+    },
+    {
+      name: "Cranberries Unsweetend",
+      sodium: 0.003,
+      carbs: 4.6
+    },
+    {
+      name: "Olives",
+      sodium: 0.735,
+      carbs: 2.2
+    },
+    {
+      name: "Strawberries",
+      sodium: 0.002,
+      carbs: 4.3
+    },
+    {
+      name: "Tomatoes",
+      sodium: 0.007,
+      carbs: 4.8
+    },
+    {
+      name: "Watermelon",
+      sodium: 0.002,
+      carbs: 5.5
+    },
+    {
+      name: "Avocado Oil",
+      sodium: 0.0,
+      carbs: 0
+    },
+    {
+      name: "Coconut Oil",
+      sodium: 0.0,
+      carbs: 0
+    },
+    {
+      name: "Ghee",
+      sodium: 0.005,
+      carbs: 0
+    },
+    {
+      name: "Bacon",
+      sodium: 0.137,
+      carbs: 0
+    },
+    {
+      name: "Beef",
+      sodium: 0.061,
+      carbs: 0
+    },
+    {
+      name: "Egg",
+      sodium: 0.062,
+      carbs: 0
+    },
+    {
+      name: "Pork",
+      sodium: 0.053,
+      carbs: 0
+    },
+    {
+      name: "Poultry",
+      sodium: 0.115,
+      carbs: 0
+    }
+  ];
+}
+</script>
+</body>
+</html>
