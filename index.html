@@ -134,6 +134,7 @@ const selectedItemsComp = () => {
     <ul style="list-style: none;">${selectedItems.map((food, index) => html.node`
       <li>
         <div for=${"food-item-"+index}><span class="food-item">${food.name}</span><br/>• Carbs: ${food.carbs}g<br/>• Sodium: ${food.sodium}g<br>
+          <button onclick=${()=>fractionFood(2, food.id)}>2x</button>
           <button onclick=${()=>fractionFood(0.75, food.id)}>0.75</button>
           <button onclick=${()=>fractionFood(0.5, food.id)}>0.5</button>
           <button onclick=${()=>fractionFood(0.25, food.id)}>0.25</button>
@@ -157,7 +158,7 @@ const layout = () => {
     </details>  
   </header>
   <main>
-    <div style="margin-bottom: 10px"><h3 style="display: inline">Foods</h3><span> (All amounts in 1 cup measurements unless egg, tortilla, etc.)</span> <button onclick=${reset}>Reset</button></div>
+    <div style="margin-bottom: 10px"><h3 style="display: inline">Foods</h3><span> (All amounts in 1 cup(8oz) measurements unless egg, tortilla, etc.)</span> <button onclick=${reset}>Reset</button></div>
     <div class="food-list-wrapper">${listItemComp()}</div>
   </main>
 
@@ -186,23 +187,28 @@ function getFoods () {
     },
     {
       name: "Apple",
-      sodium: 0.001,
+      sodium: 0,
       carbs: 15
     },
     {
+      name: "Unsweetend Apple Sauce",
+      sodium: 0,
+      carbs: 27
+    },
+    {
       name: "Orange",
-      sodium: 0.000,
+      sodium: 0,
       carbs: 28
     },
     {
       name: "Unsalted Peanut Butter",
-      sodium: 0.026,
-      carbs: 11
+      sodium: 0,
+      carbs: 28
     },
     {
-      name: "Jam",
-      sodium: 0.048,
-      carbs: 224
+      name: "Low Sugar Jam",
+      sodium: 0,
+      carbs: 64
     },
     {
       name: "Dried Apricots",
@@ -210,14 +216,64 @@ function getFoods () {
       carbs: 34
     },
     {
-      name: "Cottage Cheese",
-      sodium: 0.819,
+      name: "Oatmeal",
+      sodium: 0,
+      carbs: 62
+    },
+    {
+      name: "Cheerios",
+      sodium: 0.213,
+      carbs: 20
+    },
+    {
+      name: "Seaweed Packet",
+      sodium: 0.075,
+      carbs: 1
+    },
+    {
+      name: "Unsalted Chips",
+      sodium: 0,
+      carbs: 120
+    },
+    {
+      name: "Jalepano Chips",
+      sodium: 0.160,
+      carbs: 24
+    },
+    {
+      name: "Cream of Wheat",
+      sodium: 0.005,
+      carbs: 137
+    },
+    {
+      name: "Milk",
+      sodium: 0.107,
+      carbs: 12
+    },
+    {
+      name: "Oat Milk",
+      sodium: 0.100,
+      carbs: 16
+    },
+    {
+      name: "Almond Milk",
+      sodium: 0.150,
       carbs: 8
     },
     {
+      name: "Cottage Cheese",
+      sodium: 0.640,
+      carbs: 10
+    },
+    {
+      name: "Yogurt",
+      sodium: 0.100,
+      carbs: 11
+    },
+    {
       name: "Mozzarella",
-      sodium: 0.021,
-      carbs: 4.1
+      sodium: 0.120,
+      carbs: 1
     },
     {
       name: "Sharp Cheddar",
@@ -240,9 +296,9 @@ function getFoods () {
       carbs: 46
     },
     {
-      name: "Mayo",
-      sodium: 1.397,
-      carbs: 1.3
+      name: "Organics Mayo",
+      sodium: 0.720,
+      carbs: 0
     },
     {
       name: "Mustard",
@@ -306,7 +362,7 @@ function getFoods () {
     },
     {
       name: "Calliflower Rice",
-      sodium: 1.202,
+      sodium: .087,
       carbs: 3
     },
     {
@@ -476,9 +532,16 @@ function getFoods () {
     },
     {
       name: "Ghee",
-      sodium: 0.005,
+      sodium: 0,
       carbs: 0
     },
+
+    {
+      name: "2x Keto Oreos",
+      sodium: 0.095,
+      carbs: 12
+    },
+
     {
       name: "Bacon",
       sodium: 0.137,
