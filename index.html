@@ -74,7 +74,7 @@ let mealSodium = 0;
 let mealCarbs = 0;
 
 const foods = (() => {
-  const tmpFood = getFoods();
+  const tmpFood = getFoods().sort( compare );
   return tmpFood.map((item, index)=>({...item, id: index + 1}))
 })();
 
@@ -113,6 +113,16 @@ const reset = () => {
   mealSodium = 0;
   mealCarbs = 0;
   renderApp();
+}
+
+function compare( a, b ) {
+  if ( a.name < b.name ){
+    return -1;
+  }
+  if ( a.name > b.name ){
+    return 1;
+  }
+  return 0;
 }
 
 const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100
@@ -176,7 +186,7 @@ function renderApp () {
 function getFoods () {
   return [
     {
-      name: "Unsalted Peanuts",
+      name: "Peanuts (Unsalted)",
       sodium: 0.026,
       carbs: 24
     },
@@ -191,7 +201,7 @@ function getFoods () {
       carbs: 15
     },
     {
-      name: "Unsweetend Apple Sauce",
+      name: "Apple Sauce (Unsweetend)",
       sodium: 0,
       carbs: 27
     },
@@ -201,17 +211,17 @@ function getFoods () {
       carbs: 28
     },
     {
-      name: "Unsalted Peanut Butter",
+      name: "Peanut Butter (Unsalted)",
       sodium: 0,
       carbs: 28
     },
     {
-      name: "Low Sugar Jam",
+      name: "Jam (Low Sugar)",
       sodium: 0,
       carbs: 64
     },
     {
-      name: "Dried Apricots",
+      name: "Apricots (Dried)",
       sodium: 0.013,
       carbs: 34
     },
@@ -231,7 +241,7 @@ function getFoods () {
       carbs: 1
     },
     {
-      name: "Unsalted Chips",
+      name: "Chips (Unsalted )",
       sodium: 0,
       carbs: 120
     },
@@ -272,8 +282,8 @@ function getFoods () {
     },
     {
       name: "Mozzarella",
-      sodium: 0.120,
-      carbs: 1
+      sodium: 0.040,
+      carbs: 0
     },
     {
       name: "Sharp Cheddar",
@@ -296,8 +306,8 @@ function getFoods () {
       carbs: 46
     },
     {
-      name: "Organics Mayo",
-      sodium: 0.720,
+      name: "Mayo",
+      sodium: 0.680,
       carbs: 0
     },
     {
@@ -371,9 +381,9 @@ function getFoods () {
       carbs: 35
     },
     {
-      name: "Low Carb Bread",
-      sodium: 0.150,
-      carbs: 12
+      name: "Bread (Low Carb/Salt)",
+      sodium: 0.010,
+      carbs: 16
     },
     {
       name: "Arugula",
@@ -537,7 +547,7 @@ function getFoods () {
     },
 
     {
-      name: "2x Keto Oreos",
+      name: "Keto Oreos (2)",
       sodium: 0.095,
       carbs: 12
     },
